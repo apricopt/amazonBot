@@ -5,8 +5,7 @@ async function sendDiscordMessage(message) {
     try {
         const webhookURL = 'https://discord.com/api/webhooks/1235620178885087284/Nd7aDdUvVK6mHlKDYv_ZG6v5tHtZNz53It9sxxW8MrArdH6Thk69Z0cm29jClWUE5rON';
         const response = await axios.post(webhookURL, {
-            content:`
-            👉🏻 Product Name: ${message.title}\n👉🏻 Promotion String: ✨ ${message.promotionType} ✨\n👉🏻 Price: ${message.price}
+            content:`🔸 Product Name: ${message.title}\n🔸 Promotion String: ✨ ${message.promotionType} ✨\n🔸 Price: ${message.price}
             \n
             [Check Details](${message.detailLink})!`,
             embeds: [{

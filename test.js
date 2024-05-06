@@ -10,7 +10,7 @@ const sleep = ms => {
   const fs = require("fs");
 
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
   });
 
   const page = await browser.newPage();

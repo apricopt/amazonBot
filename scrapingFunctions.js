@@ -13,8 +13,9 @@ const processDetailPageViaLink = async (thisLink, browser) => {
       let isSale = "";
       try {
         function IsPromotionStringOfGetPriceof(inputString) {
-          const regex = /^.*Get \d+ for the price of \d+.*$/;
-          return regex.test(inputString);
+          const regex = /^.*Get \d+ for the price of \d+.*$/; // get any number for the price of
+          const regex2 = /^.*Get any.*$/; // Get any for price of
+          return regex.test(inputString) || regex2.test(inputString)
         }
 
         let parent = document.querySelector(".promoPriceBlockMessage");
@@ -52,7 +53,6 @@ const processDetailPageViaLink = async (thisLink, browser) => {
     });
 
     if (ProductInfo.isSale) {
-      // console.log("This is product info we got ", ProductInfo);
       await sendDiscordMessage({
         title: ProductInfo.productName,
         promotionType: ProductInfo.isSale,
