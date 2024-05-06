@@ -1,7 +1,7 @@
 const configuration = {
-    scanWithSaveTagsOnly: true
+    scanWithSaveTagsOnly: true,
+    minimumNumberOfProductsSold: 100
 }
 
-
-
 module.exports = {configuration}
+

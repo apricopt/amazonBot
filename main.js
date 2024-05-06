@@ -5,13 +5,16 @@ const {
 } = require("./scrapingFunctions");
 const { searchList } = require("./searchList");
 const { sleep } = require("./utils");
+const puppeteer = require("puppeteer-extra");
+const fs = require("fs");
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+  
+puppeteer.use(StealthPlugin());
 
 const launchProcess = async (searchList) => {
-  const puppeteer = require("puppeteer");
-  const fs = require("fs");
 
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
     // defaultViewport: { width: 1920, height: 1080 }
   });
 
@@ -40,7 +43,7 @@ const launchProcess = async (searchList) => {
   }
 
   // Close the browser
-  // await browser.close();
+  await browser.close();
 };
 
 launchProcess(searchList);

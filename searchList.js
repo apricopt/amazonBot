@@ -16,7 +16,7 @@
 // ];
 
 // let searchList = [];
-let searchList = ["maybelline mascara"]
+let searchList = ["Maybelline"]
 // let searchList = ["Supplements (Health & Household"]
 
 // const searchList = [

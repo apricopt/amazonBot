@@ -7,21 +7,39 @@ const processDetailPageViaLink = async (thisLink, browser) => {
     const detailPage = await browser.newPage();
     await detailPage.goto(thisLink, { timeout: 60000 });
 
-    // await sleep(3000);
-
-    const ProductInfo = await detailPage.evaluate(() => {
+    const ProductInfo = await detailPage.evaluate((configuration) => {
       let isSale = "";
       try {
         function IsPromotionStringOfGetPriceof(inputString) {
           const regex = /^.*Get \d+ for the price of \d+.*$/; // get any number for the price of
           const regex2 = /^.*Get any.*$/; // Get any for price of
-          return regex.test(inputString) || regex2.test(inputString)
+          const regex3 = /^.*2 for.*$/;  // buy one get one free
+          const regex4 = /^.*on any.*$/;
+          return regex.test(inputString) || regex2.test(inputString) || regex3.test(inputString)
+        }
+
+        function IsEnoughSalesLastMonth(inputString) {
+          const sales = parseInt(inputString.replace(/\D/g, ''), 10);
+          return sales >= configuration.minimumNumberOfProductsSold;
+        }
+
+
+        function formatPrice(price) {
+          let numberPrice =  price.match(/\d+/g).map(Number);
+
+          let finalPrice = `${numberPrice[0]}.${numberPrice[1]}`
+
+          return finalPrice;
+
         }
 
         let parent = document.querySelector(".promoPriceBlockMessage");
+        let numberOfSalesInPastMonthElement = document.querySelector("#social-proofing-faceout-title-tk_bought");
+
+        let numberOfSales = numberOfSalesInPastMonthElement.innerText.trim();
 
         let element = parent.lastElementChild.lastElementChild.innerText;
-        if (IsPromotionStringOfGetPriceof(element)) {
+        if (IsPromotionStringOfGetPriceof(element) && IsEnoughSalesLastMonth(numberOfSales)) {
           isSale = element;
           console.log(isSale);
           const productName = document.querySelector("#productTitle").innerText;
@@ -34,11 +52,13 @@ const processDetailPageViaLink = async (thisLink, browser) => {
           console.log("productName ", productName);
           console.log("imgLink ", imgLink);
           console.log("price", price);
+          console.log("numberof sales ", numberOfSales)
           return {
             isSale,
             productName,
             imgLink,
-            price: price.split("\n")[0],
+            price: formatPrice(price.split("\n")[0]),
+            numberOfSales: numberOfSales
           };
         } else {
           console.log("Its not that sale");
@@ -46,19 +66,22 @@ const processDetailPageViaLink = async (thisLink, browser) => {
 
         return { isSale };
       } catch (error) {
+
         console.log(error);
 
         return { isSale };
       }
-    });
+    }, configuration);
 
     if (ProductInfo.isSale) {
+      console.log("this is prodcut Info ", ProductInfo)
       await sendDiscordMessage({
         title: ProductInfo.productName,
         promotionType: ProductInfo.isSale,
         price: ProductInfo.price,
         detailLink: thisLink,
         imgLink: ProductInfo.imgLink,
+        numberOfSales: ProductInfo.numberOfSales
       });
     }
 
