@@ -15,7 +15,7 @@ const processDetailPageViaLink = async (thisLink, browser) => {
           const regex2 = /^.*Get any.*$/; // Get any for price of
           const regex3 = /^.*2 for.*$/;  // buy one get one free
           const regex4 = /^.*on any.*$/;
-          return regex.test(inputString) || regex2.test(inputString) || regex3.test(inputString)
+          return regex.test(inputString) || regex2.test(inputString) || regex3.test(inputString);
         }
 
         function IsEnoughSalesLastMonth(inputString) {
@@ -73,6 +73,9 @@ const processDetailPageViaLink = async (thisLink, browser) => {
       }
     }, configuration);
 
+    await sleep(90000)
+
+    console.log("This is promotion String =======>  ", ProductInfo.isSale )
     if (ProductInfo.isSale) {
       console.log("this is prodcut Info ", ProductInfo)
       await sendDiscordMessage({

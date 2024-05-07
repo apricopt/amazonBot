@@ -46,4 +46,6 @@ const launchProcess = async (searchList) => {
   await browser.close();
 };
 
-launchProcess(searchList);
+
+
+module.exports = {launchProcess}
