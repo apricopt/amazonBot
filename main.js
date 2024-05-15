@@ -3,18 +3,21 @@ const {
   openAmazon,
   processSearchItem,
 } = require("./scrapingFunctions");
-const { searchList } = require("./searchList");
 const { sleep } = require("./utils");
 const puppeteer = require("puppeteer-extra");
 const fs = require("fs");
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const { connectDB } = require("./connectDB");
+const { configuration } = require("./configuration");
   
 puppeteer.use(StealthPlugin());
 
 const launchProcess = async (searchList) => {
 
+  await connectDB();
+
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: configuration.headless,
     // defaultViewport: { width: 1920, height: 1080 }
   });
 
@@ -30,7 +33,7 @@ const launchProcess = async (searchList) => {
       let searchItem = searchList[i];
 
       console.log(
-        `🎊 Searching string  ===========>  [${i}/${searchList.length}]`
+        `🎊 Searching string  ===========>  [${i}/${searchList.length}] ----> ${searchItem}`
       );
       await processSearchItem(searchItem, page, browser);
       await sleep(5000);
