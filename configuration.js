@@ -3,7 +3,7 @@ const configuration = {
     scanWithSaveTagsOnly: true,
     minimumNumberOfProductsSold: 100,
     mongoDBURI: "mongodb://127.0.0.1:27017/amazonBot",
-    useProxy: true,
+    useProxy: false,
     proxySettings: {
         address: 'us5.4g.iproyal.com',
         port: "7523",

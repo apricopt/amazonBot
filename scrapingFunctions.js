@@ -27,8 +27,15 @@ const processDetailPageViaLink = async (thisLink, browser) => {
         }
 
         function IsEnoughSalesLastMonth(inputString) {
+          let finalNumber = 0 ;
           const sales = parseInt(inputString.replace(/\D/g, ""), 10);
-          return sales >= configuration.minimumNumberOfProductsSold;
+          if(inputString.includes("K")){
+            finalNumber = sales*1000
+          }else {
+            finalNumber = sales
+          }
+          console.log(finalNumber)
+          return finalNumber >= configuration.minimumNumberOfProductsSold;
         }
 
         function formatPrice(price) {
@@ -288,8 +295,13 @@ const selectRegion = async (region, page) => {
     await sleep(5000);
 
     await page.evaluate(() => {
-      let a = document.querySelector("#GLUXConfirmClose-announce");
-      a.click();
+      try{
+        let a = document.querySelector("#GLUXConfirmClose-announce");
+        a.click();
+      }catch(err){
+        console.log("erere", err)
+      }
+     
     });
   } else {
     await page.click(
