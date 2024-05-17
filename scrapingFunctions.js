@@ -1,7 +1,10 @@
 const { sleep } = require("./utils");
-const { sendDiscordMessage } = require("./sendDiscord");
+const { sendDiscordMessage, sendCaptcha } = require("./sendDiscord");
 const { configuration } = require("./configuration");
 const Product = require("./Models/Products");
+const  userAgent = require('user-agents');
+
+const readline = require("readline-sync");
 
 const processDetailPageViaLink = async (thisLink, browser) => {
   try {
@@ -211,11 +214,59 @@ const openAmazon = async (page, browser) => {
   do {
     try {
       page = await browser.newPage();
+      await page.setUserAgent(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+      );
+
+      // await page.setUserAgent(userAgent.random().toString())
+      
+
+      if (configuration.useProxy) {
+        await page.authenticate({
+          username: configuration.proxySettings.username,
+          password: configuration.proxySettings.password,
+        });
+      }
+
+
       await page.goto("https://www.amazon.co.uk");
       // deliver to setup
+
+      try{
+        await page.waitForSelector('.a-box-inner.a-padding-extra-large');
+        await page.screenshot({
+          "type": "png", 
+          "path": "screenshot.png",  
+          "fullPage": true, 
+        })
+
+        let img = await page.evaluate(() => {
+          let imgTag = document.querySelector('.a-row.a-text-center img');
+          return imgTag.src
+        })
+
+        await sendCaptcha(img)
+        
+        const searchItem = readline.question("Enter the captcha ?\n");
+
+        await page.type('#captchacharacters', searchItem); 
+
+        await page.click('button.a-button-text')
+
+
+    
+      }catch(err){
+        console.log("No Captcha detected!!")
+      }
+     
+
+      await sleep(10000)
       await page.click("#nav-global-location-popover-link");
 
+      // await page.click("#sp-cc-accept");
+
       isAmazonOpened = true;
+
     } catch (err) {
       console.log(
         "[Problem launching amazon... Retrying Opening Amazon in 20 seconds. If Problem persist launch in non headless mode and see whats wrong]"
@@ -253,7 +304,10 @@ const selectRegion = async (region, page) => {
   // pressing cookie button
   await sleep(4000);
 
-  await page.click("#sp-cc-accept");
+  try{
+    await page.click("#sp-cc-accept");
+  }catch(err){}
+
 
   return page;
 
